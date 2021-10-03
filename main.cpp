@@ -6,8 +6,15 @@
 
 #define MAXLINELENGTH 1000
 
+struct Label
+{
+    char name[6] = "";
+    int lineNum = -1;
+};
+
 int readAndParse(FILE *, char *, char *, char *, char *, char *);
 int isNumber(char *);
+int findLineOfLabel(Label[],char[]);
 
 int main(int argc, char *argv[])
 {
@@ -36,12 +43,6 @@ int main(int argc, char *argv[])
         exit(1);
     }
     //=========================================================================
-    struct Label
-    {
-        char name[6];
-        int lineNum;
-    };
-    
     Label labels[MAXLINELENGTH];
     //cal symbolic  address
     int lineCount = 0;
@@ -83,10 +84,20 @@ int main(int argc, char *argv[])
             }else if (!strcmp(opcode, "noop")) {
                 strcat(mCode,"111");
             }else if (!strcmp(opcode, ".fill")) {
-                // if(isNumber(arg0))  mCode = arg0;
+                if(isNumber(arg0)){
+                    strcpy(mCode,arg0);
+                }else{
+                    int num = findLineOfLabel(labels,arg0);
+                    char num_char[33];
+                    sprintf(num_char,"%d",num);
+                    strcpy(mCode,num_char);
+                }
+                printf("%s\n",mCode);
+                continue;
             }
 
             //regA
+
 
             printf("%.32s",mCode);
         }
@@ -167,4 +178,20 @@ int isNumber(char *string)
     /* return 1 if string is a number */
     int i;
     return( (sscanf(string, "%d", &i)) == 1);
+}
+
+int findLineOfLabel(Label labels[],char nameL[]){
+    int n=0;
+    while(1){
+        if(labels[n].name==""){
+            printf("The label is undefine\n");
+            exit(1);
+            break;
+        }
+        if(!strcmp(labels[n].name, nameL)){
+            return labels[n].lineNum;
+        }
+        n++;
+    }
+    return -1;
 }
