@@ -36,15 +36,36 @@ int main(int argc, char *argv[])
         exit(1);
     }
     //=========================================================================
+    struct Label
+    {
+        char name[6];
+        int lineNum;
+    };
+    
+    Label labels[MAXLINELENGTH];
+    //cal symbolic  address
+    int lineCount = 0;
+    int labelCount = 0;
+    while(1){
+        if (! readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2) ) {
+            break;
+        }
+        if(strcmp(label,"")){
+            strcpy(labels[labelCount].name,label);
+            labels[labelCount].lineNum = lineCount;
+            labelCount++;
+        }
+        lineCount++;
+    }
+
+    //start translate to machine code
+    rewind(inFilePtr);
     while(1){
         char mCode[33] = "0000000";
         if (! readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2) ) {
             break;
         }else{
-            if(!strcmp(label,"")){
-                printf("no label ");
-            }
-
+            //opcode
             if (!strcmp(opcode, "add")) {
                 strcat(mCode,"000");
             }else if (!strcmp(opcode, "nand")) {
@@ -64,6 +85,8 @@ int main(int argc, char *argv[])
             }else if (!strcmp(opcode, ".fill")) {
                 // if(isNumber(arg0))  mCode = arg0;
             }
+
+            //regA
 
             printf("%.32s",mCode);
         }
