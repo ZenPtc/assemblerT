@@ -17,6 +17,7 @@ int readAndParse(FILE *, char *, char *, char *, char *, char *);
 int isNumber(char *);
 int findLineOfLabel(Label[],char[]);
 void dec2Bi(char *,int,int,int);
+int bi2Dec(char *);
 
 int main(int argc, char *argv[])
 {
@@ -138,8 +139,8 @@ int main(int argc, char *argv[])
                     strcat(mCode,arg2);
                 }
             }
-
-            printf("%.32s",mCode);
+            int dec_value = bi2Dec(mCode);
+            printf("%d",dec_value);
         }
         printf("\n");
         currentLine++;
@@ -268,4 +269,17 @@ void dec2Bi(char * numC,int nbit,int lineCount,int inst){
             else strcat(numC,"1");
         }
     }
+}
+
+int bi2Dec(char* biCode) {
+    int dec_value = 0;
+    int base = 1;
+    int len = strlen(biCode);
+
+    for (int i = len - 1; i >= 0; i--) {
+        if (biCode[i] == '1')
+            dec_value += base;
+        base = base * 2;
+    }
+    return dec_value;
 }
