@@ -15,6 +15,7 @@ struct Label
 int readAndParse(FILE *, char *, char *, char *, char *, char *);
 int isNumber(char *);
 int findLineOfLabel(Label[],char[]);
+void dec2Bi(char *,int);
 
 int main(int argc, char *argv[])
 {
@@ -62,6 +63,7 @@ int main(int argc, char *argv[])
     //start translate to machine code
     rewind(inFilePtr);
     while(1){
+        int type = -1;  //R=0, I=1, J=2, O=3
         char mCode[33] = "0000000";
         if (! readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2) ) {
             break;
@@ -69,20 +71,30 @@ int main(int argc, char *argv[])
             //opcode
             if (!strcmp(opcode, "add")) {
                 strcat(mCode,"000");
+                type = 0;
             }else if (!strcmp(opcode, "nand")) {
                 strcat(mCode,"001");
+                type = 0;
             }else if (!strcmp(opcode, "lw")) {
                 strcat(mCode,"010");
+                type = 1;
             }else if (!strcmp(opcode, "sw")) {
                 strcat(mCode,"011");
+                type = 1;
             }else if (!strcmp(opcode, "beq")) {
                 strcat(mCode,"100");
+                type = 1;
             }else if (!strcmp(opcode, "jalr")) {
                 strcat(mCode,"101");
+                type = 2;
             }else if (!strcmp(opcode, "halt")) {
                 strcat(mCode,"110");
+                strcat(mCode,"0000000000000000000000");
+                type = 3;
             }else if (!strcmp(opcode, "noop")) {
                 strcat(mCode,"111");
+                strcat(mCode,"0000000000000000000000");
+                type = 3;
             }else if (!strcmp(opcode, ".fill")) {
                 if(isNumber(arg0)){
                     strcpy(mCode,arg0);
@@ -96,8 +108,30 @@ int main(int argc, char *argv[])
                 continue;
             }
 
-            //regA
+            //arg0
+            if(type<3){
+                dec2Bi(arg0,3);
+                strcat(mCode,arg0);
+            }
 
+            //arg1
+            if(type<3){
+                dec2Bi(arg1,3);
+                strcat(mCode,arg1);
+            }
+
+            //arg2
+            if(type<2){
+                if(type==0){
+                    strcat(mCode,"0000000000000");
+                    dec2Bi(arg2,3);
+                    strcat(mCode,arg2);
+                }else if(type==2){
+                    strcat(mCode,"0000000000000000");
+                }else if(type==1){      //do 16bit 2's complement
+
+                }
+            }
 
             printf("%.32s",mCode);
         }
@@ -194,4 +228,18 @@ int findLineOfLabel(Label labels[],char nameL[]){
         n++;
     }
     return -1;
+}
+
+void dec2Bi(char * numC,int nbit){
+    int n;
+    sscanf(numC, "%d", &n);
+    strcpy(numC,"");
+
+    for (int i = nbit-1; i >= 0; i--) {
+        int k = n >> i;
+        if (k & 1)
+            strcat(numC,"1");
+        else
+            strcat(numC,"0");
+    }
 }
