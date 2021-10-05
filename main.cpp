@@ -11,11 +11,12 @@ struct Label
     char name[6] = "";
     int lineNum = -1;
 };
+Label labels[MAXLINELENGTH];
 
 int readAndParse(FILE *, char *, char *, char *, char *, char *);
 int isNumber(char *);
 int findLineOfLabel(Label[],char[]);
-void dec2Bi(char *,int);
+void dec2Bi(char *,int,int,int);
 
 int main(int argc, char *argv[])
 {
@@ -44,7 +45,6 @@ int main(int argc, char *argv[])
         exit(1);
     }
     //=========================================================================
-    Label labels[MAXLINELENGTH];
     //cal symbolic  address
     int lineCount = 0;
     int labelCount = 0;
@@ -64,6 +64,7 @@ int main(int argc, char *argv[])
     rewind(inFilePtr);
     while(1){
         int type = -1;  //R=0, I=1, J=2, O=3
+        int currentLine = 0;
         char mCode[33] = "0000000";
         if (! readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2) ) {
             break;
@@ -110,13 +111,13 @@ int main(int argc, char *argv[])
 
             //arg0
             if(type<3){
-                dec2Bi(arg0,3);
+                dec2Bi(arg0,3,currentLine,-1);
                 strcat(mCode,arg0);
             }
 
             //arg1
             if(type<3){
-                dec2Bi(arg1,3);
+                dec2Bi(arg1,3,currentLine,-1);
                 strcat(mCode,arg1);
             }
 
@@ -124,18 +125,24 @@ int main(int argc, char *argv[])
             if(type<2){
                 if(type==0){
                     strcat(mCode,"0000000000000");
-                    dec2Bi(arg2,3);
+                    dec2Bi(arg2,3,currentLine,-1);
                     strcat(mCode,arg2);
                 }else if(type==2){
                     strcat(mCode,"0000000000000000");
                 }else if(type==1){      //do 16bit 2's complement
-
+                    if (!strcmp(opcode, "beq")){
+                        dec2Bi(arg2,16,currentLine,1);
+                    }else{
+                        dec2Bi(arg2,16,currentLine,0);
+                    }
+                    strcat(mCode,arg2);
                 }
             }
 
             printf("%.32s",mCode);
         }
         printf("\n");
+        currentLine++;
     }
 
     //=========================================================================
@@ -230,16 +237,35 @@ int findLineOfLabel(Label labels[],char nameL[]){
     return -1;
 }
 
-void dec2Bi(char * numC,int nbit){
+//inst -1 = not I type, 0=lw,sw, 1=beq
+void dec2Bi(char * numC,int nbit,int lineCount,int inst){
     int n;
-    sscanf(numC, "%d", &n);
-    strcpy(numC,"");
+    int sign=0;
 
+    if(isNumber(numC)){
+        sscanf(numC, "%d", &n);
+    }else{
+        n = findLineOfLabel(labels,numC);
+        if(inst==1){
+            n = lineCount - n;
+        }
+    }
+
+    if(n<0){
+        sign=1;
+        n *= -1;
+        n--;
+    } 
+
+    strcpy(numC,"");
     for (int i = nbit-1; i >= 0; i--) {
         int k = n >> i;
         if (k & 1)
-            strcat(numC,"1");
-        else
-            strcat(numC,"0");
+            if(sign==0) strcat(numC,"1");
+            else strcat(numC,"0");
+        else{
+            if(sign==0) strcat(numC,"0");
+            else strcat(numC,"1");
+        }
     }
 }
