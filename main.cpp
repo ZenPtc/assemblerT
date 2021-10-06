@@ -254,6 +254,7 @@ void dec2Bi(char * numC,int nbit,int lineCount,int inst){
     int n;
     int sign=0;
 
+    //cal offsetField
     if(isNumber(numC)){
         sscanf(numC, "%d", &n);
     }else{
@@ -261,6 +262,17 @@ void dec2Bi(char * numC,int nbit,int lineCount,int inst){
         if(inst==1){
             n = n - lineCount;
         }
+    }
+
+    //check if offsetField have more than 16 bits
+    if((n > 32767 || n < -32768) && (inst==0 || inst==1)){
+        printf("OffsetField have more than 16 bits.");
+        exit(1);
+    }
+    //check if other argument have more than 3 bits
+    if((n > 7 || n < 0) && (inst==-1)){
+        printf("Argument is not the right number.");
+        exit(1);
     }
 
     if(n<0){
