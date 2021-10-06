@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
                     sprintf(num_char,"%d",num);
                     strcpy(mCode,num_char);
                 }
-                printf("%s\n",mCode);
+                fprintf(outFilePtr,"%s\n",mCode);
                 continue;
             }
 
@@ -152,10 +152,12 @@ int main(int argc, char *argv[])
                 }
             }
             int dec_value = bi2Dec(mCode);
-            printf("%d",dec_value);
+            fprintf(outFilePtr,"%d\n",dec_value);
         }
-        printf("\n");
     }
+
+    fclose(inFilePtr);
+    fclose(outFilePtr);
 
     //=========================================================================
     // /* here is an example for how to use readAndParse to read a line from
