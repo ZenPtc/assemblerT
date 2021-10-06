@@ -63,9 +63,10 @@ int main(int argc, char *argv[])
 
     //start translate to machine code
     rewind(inFilePtr);
+    int currentLine = 0;
     while(1){
         int type = -1;  //R=0, I=1, J=2, O=3
-        int currentLine = 0;
+        currentLine++;
         char mCode[33] = "0000000";
         if (! readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2) ) {
             break;
@@ -143,7 +144,6 @@ int main(int argc, char *argv[])
             printf("%d",dec_value);
         }
         printf("\n");
-        currentLine++;
     }
 
     //=========================================================================
@@ -248,7 +248,7 @@ void dec2Bi(char * numC,int nbit,int lineCount,int inst){
     }else{
         n = findLineOfLabel(labels,numC);
         if(inst==1){
-            n = lineCount - n;
+            n = n - lineCount;
         }
     }
 
