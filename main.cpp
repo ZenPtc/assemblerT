@@ -53,6 +53,17 @@ int main(int argc, char *argv[])
         if (! readAndParse(inFilePtr, label, opcode, arg0, arg1, arg2) ) {
             break;
         }
+
+        //check is have the duplicate label name
+        int  n = labelCount;
+        while(n>=0){
+            if(!strcmp(label,labels[n].name) && strcmp(label,"")){
+                printf("The label is already exist.");
+                exit(1);
+            }
+            n--;
+        }
+
         if(strcmp(label,"")){
             strcpy(labels[labelCount].name,label);
             labels[labelCount].lineNum = lineCount;
@@ -225,8 +236,8 @@ int isNumber(char *string)
 int findLineOfLabel(Label labels[],char nameL[]){
     int n=0;
     while(1){
-        if(labels[n].name==""){
-            printf("The label is undefine\n");
+        if(!strcmp(labels[n].name,"")){
+            printf("The label is undefine.\n");
             exit(1);
             break;
         }
