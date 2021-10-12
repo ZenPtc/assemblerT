@@ -1,5 +1,6 @@
 /* instruction-level simulator */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -23,15 +24,15 @@ int main(int argc, char *argv[])
     FILE *filePtr;
 
     if (argc != 2) {
-	printf("error: usage: %s <machine-code file>\n", argv[0]);
-	exit(1);
+        printf("error: usage: %s <machine-code file>\n", argv[0]);
+        exit(1);
     }
 
     filePtr = fopen(argv[1], "r");
     if (filePtr == NULL) {
-	printf("error: can't open file %s", argv[1]);
-	perror("fopen");
-	exit(1);
+        printf("error: can't open file %s", argv[1]);
+        perror("fopen");
+        exit(1);
     }
 
     /* read in the entire machine-code file into memory */
