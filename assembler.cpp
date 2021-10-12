@@ -235,6 +235,7 @@ int isNumber(char *string)
     return( (sscanf(string, "%d", &i)) == 1);
 }
 
+//=========================================================================
 int findLineOfLabel(Label labels[],char nameL[]){
     int n=0;
     while(1){
