@@ -16,6 +16,7 @@ typedef struct stateStruct {
 } stateType;
 
 void printState(stateType *);
+void dec2Bi(char *);
 
 int main(int argc, char *argv[])
 {
@@ -35,15 +36,40 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
+    char *memBin[NUMMEMORY];
+
     /* read in the entire machine-code file into memory */
-    for (state.numMemory = 0; fgets(line, MAXLINELENGTH, filePtr) != NULL;
-	state.numMemory++) {
-	if (sscanf(line, "%d", state.mem+state.numMemory) != 1) {
-	    printf("error in reading address %d\n", state.numMemory);
-	    exit(1);
-	}
-	printf("memory[%d]=%d\n", state.numMemory, state.mem[state.numMemory]);
+    for (state.numMemory = 0; fgets(line, MAXLINELENGTH, filePtr) != NULL; state.numMemory++) {
+        if (sscanf(line, "%d", state.mem+state.numMemory) != 1) {
+            printf("error in reading address %d\n", state.numMemory);
+            exit(1);
+        }
+        memBin[state.numMemory] = line;
+        dec2Bi(memBin[state.numMemory]);
+        printf("memory[%d]=%d\n", state.numMemory, state.mem[state.numMemory]);
+        printf("%s\n",memBin[state.numMemory]);
     }
+
+    //=========================================================================
+    //set reg 0-7 and program counter to zero
+    state.pc = 0;
+    for(int i=0;i<8;i++){
+        state.reg[i] = 0;
+    }
+
+    //loop read the instruction until find HALT instruction
+    int numExeInst = 0;
+    // while(1){
+
+    // }
+
+    //print final state before exit program
+    /*printf("total of %d instructions executed\n",numExeInst);
+    printf("final state of machine:\n");
+    printState(&state);*/
+
+    fclose(filePtr);
+    //=========================================================================
 
     return(0);
 }
@@ -62,4 +88,20 @@ void printState(stateType *statePtr)
 	    printf("\t\treg[ %d ] %d\n", i, statePtr->reg[i]);
 	}
     printf("end state\n");
+}
+
+//=========================================================================
+void dec2Bi(char *num){
+    int n = 0;
+    sscanf(num, "%d", &n);
+
+    strcpy(num,"");
+    for (int i = 32-1; i >= 0; i--) {
+        int k = n >> i;
+        if (k & 1)
+            strcat(num,"1");
+        else{
+            strcat(num,"0");
+        }
+    }
 }
