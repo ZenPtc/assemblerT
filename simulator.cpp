@@ -18,6 +18,8 @@ typedef struct stateStruct {
 void printState(stateType *);
 void dec2Bi(char *);
 int bi2Dec(char [],int);
+void ADD(int,int,int,int *);
+void NAND(int,int,int,int *);
 
 int main(int argc, char *argv[])
 {
@@ -94,6 +96,21 @@ int main(int argc, char *argv[])
         memcpy(destReg,&memBin[state.pc-1][29],3);
         numOffset  = bi2Dec(offset,1);      //use 2's complement
         numDestReg = bi2Dec(destReg,0);
+
+        //do instruction
+        if(!strcmp(opcode, "000")){             //add
+            ADD(numRegA,numRegB,numDestReg,state.reg);
+        }else if(!strcmp(opcode, "001")){       //nand
+            NAND(numRegA,numRegB,numDestReg,state.reg);
+        }else if(!strcmp(opcode, "010")){       //lw
+            
+        }else if(!strcmp(opcode, "011")){       //sw
+            
+        }else if(!strcmp(opcode, "100")){       //beq
+            
+        }else if(!strcmp(opcode, "101")){       //jalr
+            
+        }
     }
 
     //print final state before exit program
@@ -145,7 +162,7 @@ int bi2Dec(char biCode[],int twoComp){
     int base = 1;
     int len = strlen(biCode);
     int neg = 0;  //if 1 it's means negative number
-    char *firstBit;
+    char *firstBit = biCode;
     memcpy(firstBit,&biCode[0],1);
 
     if(!strcmp(firstBit,"1") && twoComp==1){
@@ -171,4 +188,22 @@ int bi2Dec(char biCode[],int twoComp){
     }
 
     return dec_value;
+}
+
+void ADD(int regA,int regB,int destReg,int *regArr){
+    int valueA,valueB;
+
+    valueA = *(regArr+regA);
+    valueB = *(regArr+regB);
+
+    *(regArr+destReg) = valueA + valueB;
+}
+
+void NAND(int regA,int regB,int destReg,int *regArr){
+    int valueA,valueB;
+
+    valueA = *(regArr+regA);
+    valueB = *(regArr+regB);
+
+    *(regArr+destReg) = ~(valueA & valueB);
 }
