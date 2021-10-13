@@ -22,6 +22,7 @@ void ADD(int,int,int,int *);
 void NAND(int,int,int,int *);
 void LW(int,int,int,int *,int *);
 void SW(int,int,int,int *,int *);
+void BEQ(int,int,int,int *,int *);
 
 int main(int argc, char *argv[])
 {
@@ -72,30 +73,30 @@ int main(int argc, char *argv[])
     int numRegA,numRegB,numOffset,numDestReg;
     while(1){
         //printState before execute
-        // printState(&state);
-        state.pc++;
+        printState(&state);
         numExeInst++;
 
         //read opcode
-        memcpy(opcode,&memBin[state.pc-1][7],3);
+        memcpy(opcode,&memBin[state.pc][7],3);
         if(!strcmp(opcode, "110")){         //halt
-            printf("machine halted");
+            printf("machine halted\n");
+            state.pc++;
             break;
         }else if(!strcmp(opcode, "111")){   //noop
             continue;
         }
 
         //read regA
-        memcpy(regA,&memBin[state.pc-1][10],3);
+        memcpy(regA,&memBin[state.pc][10],3);
         numRegA = bi2Dec(regA,0);
 
         //read regB
-        memcpy(regB,&memBin[state.pc-1][13],3);
+        memcpy(regB,&memBin[state.pc][13],3);
         numRegB = bi2Dec(regB,0);
 
         //read other field
-        memcpy(offset,&memBin[state.pc-1][16],16);
-        memcpy(destReg,&memBin[state.pc-1][29],3);
+        memcpy(offset,&memBin[state.pc][16],16);
+        memcpy(destReg,&memBin[state.pc][29],3);
         numOffset  = bi2Dec(offset,1);      //use 2's complement
         numDestReg = bi2Dec(destReg,0);
 
@@ -109,16 +110,18 @@ int main(int argc, char *argv[])
         }else if(!strcmp(opcode, "011")){       //sw
             SW(numRegA,numRegB,numOffset,state.reg,state.mem);
         }else if(!strcmp(opcode, "100")){       //beq
-            
+            BEQ(numRegA,numRegB,numOffset,state.reg,&state.pc);
         }else if(!strcmp(opcode, "101")){       //jalr
             
         }
+
+        state.pc++;
     }
 
     //print final state before exit program
-    /*printf("total of %d instructions executed\n",numExeInst);
+    printf("total of %d instructions executed\n",numExeInst);
     printf("final state of machine:\n");
-    printState(&state);*/
+    printState(&state);
 
     fclose(filePtr);
     //=========================================================================
@@ -164,7 +167,8 @@ int bi2Dec(char biCode[],int twoComp){
     int base = 1;
     int len = strlen(biCode);
     int neg = 0;  //if 1 it's means negative number
-    char *firstBit = biCode;
+    char firstBit[2];
+    strcpy(firstBit+1,"\0");
     memcpy(firstBit,&biCode[0],1);
 
     if(!strcmp(firstBit,"1") && twoComp==1){
@@ -228,4 +232,15 @@ void SW(int regA,int regB,int offset,int *regArr,int *memArr){
     memAddr = valueA + offset;
 
     *(memArr+memAddr) = valueB;
+}
+
+void BEQ(int regA,int regB,int offset,int *regArr,int *pc){
+    int valueA,valueB;
+
+    valueA = *(regArr+regA);
+    valueB = *(regArr+regB);
+
+    if(valueA == valueB){
+        *pc = (*pc)+offset;
+    }
 }
