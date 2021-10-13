@@ -36,21 +36,25 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    char *memBin[NUMMEMORY];
-
     /* read in the entire machine-code file into memory */
     for (state.numMemory = 0; fgets(line, MAXLINELENGTH, filePtr) != NULL; state.numMemory++) {
         if (sscanf(line, "%d", state.mem+state.numMemory) != 1) {
             printf("error in reading address %d\n", state.numMemory);
             exit(1);
         }
-        memBin[state.numMemory] = line;
-        dec2Bi(memBin[state.numMemory]);
         printf("memory[%d]=%d\n", state.numMemory, state.mem[state.numMemory]);
-        printf("%s\n",memBin[state.numMemory]);
     }
 
     //=========================================================================
+    //translate decimal instruction to binary
+    char memBin[state.numMemory][33];
+    char temp[MAXLINELENGTH];
+    for(int i=0;i<state.numMemory;i++){
+        sprintf(temp,"%d",state.mem[i]);
+        dec2Bi(temp);
+        strcpy(memBin[i],temp);
+    }
+
     //set reg 0-7 and program counter to zero
     state.pc = 0;
     for(int i=0;i<8;i++){
