@@ -23,6 +23,7 @@ void NAND(int,int,int,int *);
 void LW(int,int,int,int *,int *);
 void SW(int,int,int,int *,int *);
 void BEQ(int,int,int,int *,int *);
+void JALR(int,int,int *,int *);
 
 int main(int argc, char *argv[])
 {
@@ -73,7 +74,7 @@ int main(int argc, char *argv[])
     int numRegA,numRegB,numOffset,numDestReg;
     while(1){
         //printState before execute
-        printState(&state);
+        // printState(&state);
         numExeInst++;
 
         //read opcode
@@ -112,16 +113,16 @@ int main(int argc, char *argv[])
         }else if(!strcmp(opcode, "100")){       //beq
             BEQ(numRegA,numRegB,numOffset,state.reg,&state.pc);
         }else if(!strcmp(opcode, "101")){       //jalr
-            
+            JALR(numRegA,numRegB,state.reg,&state.pc);
         }
 
         state.pc++;
     }
 
     //print final state before exit program
-    printf("total of %d instructions executed\n",numExeInst);
-    printf("final state of machine:\n");
-    printState(&state);
+    // printf("total of %d instructions executed\n",numExeInst);
+    // printf("final state of machine:\n");
+    // printState(&state);
 
     fclose(filePtr);
     //=========================================================================
@@ -243,4 +244,12 @@ void BEQ(int regA,int regB,int offset,int *regArr,int *pc){
     if(valueA == valueB){
         *pc = (*pc)+offset;
     }
+}
+
+void JALR(int regA,int regB,int *regArr,int *pc){
+    int valueA;
+    valueA = *(regArr+regA);
+
+    *(regArr+regB) = (*pc)+1;
+    *pc = valueA;
 }
