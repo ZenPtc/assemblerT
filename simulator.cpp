@@ -17,6 +17,7 @@ typedef struct stateStruct {
 
 void printState(stateType *);
 void dec2Bi(char *);
+int bi2Dec(char [],int);
 
 int main(int argc, char *argv[])
 {
@@ -63,9 +64,37 @@ int main(int argc, char *argv[])
 
     //loop read the instruction until find HALT instruction
     int numExeInst = 0;
-    // while(1){
+    char opcode[4],regA[4],regB[4],offset[17],destReg[4];
+    int numRegA,numRegB,numOffset,numDestReg;
+    while(1){
+        //printState before execute
+        // printState(&state);
+        state.pc++;
+        numExeInst++;
 
-    // }
+        //read opcode
+        memcpy(opcode,&memBin[state.pc-1][7],3);
+        if(!strcmp(opcode, "110")){         //halt
+            printf("machine halted");
+            break;
+        }else if(!strcmp(opcode, "111")){   //noop
+            continue;
+        }
+
+        //read regA
+        memcpy(regA,&memBin[state.pc-1][10],3);
+        numRegA = bi2Dec(regA,0);
+
+        //read regB
+        memcpy(regB,&memBin[state.pc-1][13],3);
+        numRegB = bi2Dec(regB,0);
+
+        //read other field
+        memcpy(offset,&memBin[state.pc-1][16],16);
+        memcpy(destReg,&memBin[state.pc-1][29],3);
+        numOffset  = bi2Dec(offset,1);      //use 2's complement
+        numDestReg = bi2Dec(destReg,0);
+    }
 
     //print final state before exit program
     /*printf("total of %d instructions executed\n",numExeInst);
@@ -108,4 +137,38 @@ void dec2Bi(char *num){
             strcat(num,"0");
         }
     }
+}
+
+//twoComp -> 0 is not use ,1 is use 2's complement
+int bi2Dec(char biCode[],int twoComp){
+    int dec_value = 0;
+    int base = 1;
+    int len = strlen(biCode);
+    int neg = 0;  //if 1 it's means negative number
+    char *firstBit;
+    memcpy(firstBit,&biCode[0],1);
+
+    if(!strcmp(firstBit,"1") && twoComp==1){
+        neg = 1;
+    }
+
+    for (int i = len - 1; i >= 0; i--) {
+        if(twoComp==1 && neg==1){
+            if(biCode[i] == '0'){
+                dec_value += base;
+            }
+        }else{
+            if(biCode[i] == '1'){
+                dec_value += base;
+            }
+        }
+        base = base * 2;
+    }
+
+    if(neg==1){
+        dec_value += 1;
+        dec_value *= -1;
+    }
+
+    return dec_value;
 }
