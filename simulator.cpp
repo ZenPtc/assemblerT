@@ -20,6 +20,8 @@ void dec2Bi(char *);
 int bi2Dec(char [],int);
 void ADD(int,int,int,int *);
 void NAND(int,int,int,int *);
+void LW(int,int,int,int *,int *);
+void SW(int,int,int,int *,int *);
 
 int main(int argc, char *argv[])
 {
@@ -103,9 +105,9 @@ int main(int argc, char *argv[])
         }else if(!strcmp(opcode, "001")){       //nand
             NAND(numRegA,numRegB,numDestReg,state.reg);
         }else if(!strcmp(opcode, "010")){       //lw
-            
+            LW(numRegA,numRegB,numOffset,state.reg,state.mem);
         }else if(!strcmp(opcode, "011")){       //sw
-            
+            SW(numRegA,numRegB,numOffset,state.reg,state.mem);
         }else if(!strcmp(opcode, "100")){       //beq
             
         }else if(!strcmp(opcode, "101")){       //jalr
@@ -206,4 +208,24 @@ void NAND(int regA,int regB,int destReg,int *regArr){
     valueB = *(regArr+regB);
 
     *(regArr+destReg) = ~(valueA & valueB);
+}
+
+void LW(int regA,int regB,int offset,int *regArr,int *memArr){
+    int valueA,memAddr,valueM;
+
+    valueA = *(regArr+regA);
+    memAddr = valueA + offset;
+    valueM = *(memArr+memAddr);
+
+    *(regArr+regB) = valueM;
+}
+
+void SW(int regA,int regB,int offset,int *regArr,int *memArr){
+    int valueA,valueB,memAddr;
+
+    valueA = *(regArr+regA);
+    valueB = *(regArr+regB);
+    memAddr = valueA + offset;
+
+    *(memArr+memAddr) = valueB;
 }
