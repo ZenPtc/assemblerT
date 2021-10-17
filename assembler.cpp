@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
             }
 
             //arg2
-            if(type<2){
+            if(type<=2){
                 if(type==0){
                     strcat(mCode,"0000000000000");
                     dec2Bi(arg2,3,currentLine,-1);
