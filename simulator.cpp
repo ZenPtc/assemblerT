@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
     int numRegA,numRegB,numOffset,numDestReg;
     while(1){
         //printState before execute
-        // printState(&state);
+        printState(&state);
         numExeInst++;
 
         //read opcode
@@ -114,15 +114,16 @@ int main(int argc, char *argv[])
             BEQ(numRegA,numRegB,numOffset,state.reg,&state.pc);
         }else if(!strcmp(opcode, "101")){       //jalr
             JALR(numRegA,numRegB,state.reg,&state.pc);
+            continue;
         }
 
         state.pc++;
     }
 
     //print final state before exit program
-    // printf("total of %d instructions executed\n",numExeInst);
-    // printf("final state of machine:\n");
-    // printState(&state);
+    printf("total of %d instructions executed\n",numExeInst);
+    printf("final state of machine:\n");
+    printState(&state);
 
     fclose(filePtr);
     //=========================================================================
