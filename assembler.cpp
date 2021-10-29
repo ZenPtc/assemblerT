@@ -120,6 +120,9 @@ int main(int argc, char *argv[])
                 }
                 fprintf(outFilePtr,"%s\n",mCode);
                 continue;
+            }else{
+                printf("Wrong opcode");
+                exit(1);
             }
 
             //arg0
