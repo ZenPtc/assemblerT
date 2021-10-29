@@ -84,6 +84,7 @@ int main(int argc, char *argv[])
             state.pc++;
             break;
         }else if(!strcmp(opcode, "111")){   //noop
+            state.pc++;
             continue;
         }
 
